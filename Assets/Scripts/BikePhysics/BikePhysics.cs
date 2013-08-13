@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using System.Collections;
+/// this is a 2d game
 
  
 
