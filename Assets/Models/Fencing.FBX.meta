@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 906bbad4892c310468a9be89ccc104df
+=======
+guid: 3c9a72152d2a99243a133392150d14eb
+>>>>>>> ace4bd8c3a427ee7baeb626d15ea6d5a7e6de6a9
 ModelImporter:
   serializedVersion: 15
   fileIDToRecycleName:
@@ -10,6 +14,14 @@ ModelImporter:
     100008: NGon003
     100010: Rope
     100012: rPole
+<<<<<<< HEAD
+=======
+    100014: Cylinder001
+    100016: Plane001
+    100018: Plane002
+    100020: Plane003
+    100022: Plane004
+>>>>>>> ace4bd8c3a427ee7baeb626d15ea6d5a7e6de6a9
     400000: //RootNode
     400002: lPole
     400004: NGon001
@@ -17,21 +29,54 @@ ModelImporter:
     400008: NGon003
     400010: Rope
     400012: rPole
+<<<<<<< HEAD
+=======
+    400014: Cylinder001
+    400016: Plane001
+    400018: Plane002
+    400020: Plane003
+    400022: Plane004
+>>>>>>> ace4bd8c3a427ee7baeb626d15ea6d5a7e6de6a9
     2300000: lPole
     2300002: NGon001
     2300004: NGon002
     2300006: NGon003
     2300008: rPole
+<<<<<<< HEAD
+=======
+    2300010: Cylinder001
+    2300012: Plane001
+    2300014: Plane002
+    2300016: Plane003
+    2300018: Plane004
+>>>>>>> ace4bd8c3a427ee7baeb626d15ea6d5a7e6de6a9
     3300000: lPole
     3300002: NGon001
     3300004: NGon002
     3300006: NGon003
     3300008: rPole
+<<<<<<< HEAD
+=======
+    3300010: Cylinder001
+    3300012: Plane001
+    3300014: Plane002
+    3300016: Plane003
+    3300018: Plane004
+>>>>>>> ace4bd8c3a427ee7baeb626d15ea6d5a7e6de6a9
     4300000: rPole
     4300002: lPole
     4300004: NGon001
     4300006: NGon002
     4300008: NGon003
+<<<<<<< HEAD
+=======
+    4300010: Cylinder001
+    4300012: Plane001
+    4300014: Plane002
+    4300016: Plane003
+    4300018: Plane004
+    7400000: Take 001
+>>>>>>> ace4bd8c3a427ee7baeb626d15ea6d5a7e6de6a9
     9500000: //RootNode
   materials:
     importMaterials: 1
@@ -50,7 +95,11 @@ ModelImporter:
   meshes:
     lODScreenPercentages: []
     globalScale: .00999999978
+<<<<<<< HEAD
     meshCompression: 0
+=======
+    meshCompression: 3
+>>>>>>> ace4bd8c3a427ee7baeb626d15ea6d5a7e6de6a9
     addColliders: 0
     importBlendShapes: 1
     swapUVChannels: 0
@@ -66,7 +115,11 @@ ModelImporter:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
     normalImportMode: 0
+<<<<<<< HEAD
     tangentImportMode: 1
+=======
+    tangentImportMode: 0
+>>>>>>> ace4bd8c3a427ee7baeb626d15ea6d5a7e6de6a9
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
