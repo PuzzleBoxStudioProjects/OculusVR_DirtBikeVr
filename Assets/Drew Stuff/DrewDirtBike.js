@@ -4,7 +4,8 @@ var backLWheelCollider : WheelCollider;
 
 var frontWheelTransform : Transform;
 var backWheelTransform : Transform;
- 
+var handleBars : Transform;
+
 var motorPower : float = 50;
 var maxSteerAngle : float = 10;
 var centerOfMass : Vector3;
@@ -14,7 +15,7 @@ var bike : DrewDirtBike;
 
 private var backWheelRotation : float = 0.0f;
 private var frontWheelRotation : float = 0.0f;
-private var resetTimer : float = 0.0f;
+private var handleBarsRotation : float = 0.0f;
  
 function Start() {
 	bike = this;
@@ -57,10 +58,11 @@ function Update() {
     backWheelRotation = Mathf.Repeat(backWheelRotation + deltaTime * backLWheelCollider.rpm * 360.0 / 60.0, 360.0);
  
     // set the rotation of the wheels
-    frontWheelTransform.localRotation = Quaternion.Euler(frontWheelRotation, steer * maxSteerAngle, 0.0);
-    backWheelTransform.localRotation = Quaternion.Euler(backWheelRotation, 0, 0.0);
+    frontWheelTransform.localRotation = Quaternion.Euler(frontWheelRotation, 0, 0);
+    backWheelTransform.localRotation = Quaternion.Euler(backWheelRotation, 0, 0);
+    handleBars.localRotation = Quaternion.Euler(handleBars.localEulerAngles.x, steer * maxSteerAngle, 0);
     
-    var rotDir = Vector3(transform.eulerAngles.x, transform.eulerAngles.y, Mathf.LerpAngle(transform.eulerAngles.z, -50 * steer, 0.3f));
+    var rotDir = Vector3(transform.eulerAngles.x, transform.eulerAngles.y, Mathf.LerpAngle(transform.eulerAngles.z, -10 * steer, 0.3f));
 //    bike.transform.localRotation = Quaternion.LookRotation(rotDir);
     
     transform.eulerAngles = rotDir;
