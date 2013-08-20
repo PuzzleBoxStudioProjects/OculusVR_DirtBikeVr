@@ -3,25 +3,28 @@ using System.Collections.Generic;
 
 public class LevelScripts : MonoBehaviour 
 {
-	
-	public static bool canRace = false;
 
 	public AudioClip[] clipHolder;
 	public GameObject[] lightHolder;
 	public GameObject[] gateHolder;
 	
 	public int currentPosition;
-	public int totalLaps;
+	public int totalLaps = 5;
 	public int lapsLeft = 0;
 	public int currentLap = 0;
+	public static bool  isGreen = false;
 	
-	private float timeLength = 3.0f;
 	private float lightTimer;
-	private bool  isGreen = false;
-	private bool  playOnce = false;
-	private float waitTimer = 0.0f;
 	private int lightCount = 0;
+	private float waitTimer = 0.0f;
+	
 	public int clipCount = 0;
+	private bool  playOnce = false;
+	private float timeLength = 3.0f;
+	
+	private float currTimer = 0.0f;
+	private float prevTimer = 0.0f;
+	public float showTimer = 0.0f;
 	void Awake()
 	{
 	  
@@ -63,34 +66,19 @@ public class LevelScripts : MonoBehaviour
 				
 		
 			}
+			else
+			{
+				StartTimer();
+				print (showTimer);
+			//	StartLapCounter();
+			}
 		}
 	}
-//		
-//	 if(clipCount == 8 )
-//		{
-//			if(currentLap == totalLaps && currentPosition == 1)
-//			{
-//				audio.PlayOneShot(clipHolder[clipCount]);
-//				timeLength += Time.time + 10;
-//				clipCount  = 9;
-//			}
-//			else
-//			{
-//					audio.PlayOneShot(clipHolder[clipCount+1]);
-//					timeLength = Time.time +10;
-//					clipCount = 9;
-//			}
-//		}
-//		if (clipCount == 9)
-//		{
-//				// go to the win screen;
-//		}
-//	}
-//	
+
 	
 	void LightActivation()
 	{
-			waitTimer = 0.7f;
+			waitTimer = 0.72f;
 			if(lightCount <= 3)
 			{
 			lightHolder[lightCount].SetActive(true);
@@ -99,8 +87,29 @@ public class LevelScripts : MonoBehaviour
 		else
 		{
 			clipCount++;
+			audio.PlayOneShot(clipHolder[clipCount]);
+			for( int i = 0; i < 1; i++)
+			{
+				gateHolder[i].transform.localRotation = new Quaternion(90.0f,3.0f,0.0f,0.0f);
+			}
+			isGreen = true;
 		}
 			lightCount++;
+	}
+	
+	void StartTimer()
+	{
+		if (currTimer == 0.0f && prevTimer == 0)
+		{
+			currTimer = Time.time;
+			prevTimer = Time.time;
+		}
+		else
+		{
+			currTimer = Time.time;	
+		}
+		showTimer += currTimer - prevTimer;
+		prevTimer = currTimer;
 	}
 	
 }
