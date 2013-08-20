@@ -33,6 +33,8 @@ public class BikeAI : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
 
+        agent.autoBraking = false;
+
         allTargets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Checkpoint"));
         allTargets.Add(finishTarget);
 
@@ -63,22 +65,26 @@ public class BikeAI : MonoBehaviour
             hasCrashed = false;
         }
 
-        float dist = Vector3.Distance(allTargets[curTarget].transform.position, transform.position);
-
-        if (dist < 20)
+        if (curTarget < allTargets.Count - 1)
         {
-            if (curTarget < allTargets.Capacity - 1)
+            float dist = Vector3.Distance(allTargets[curTarget].transform.position, transform.position);
+
+            if (dist < 20)
             {
                 curTarget++;
                 agent.destination = allTargets[curTarget].transform.position;
             }
         }
+
+        if (curTarget == allTargets.Count)
+        {
+            agent.autoBraking = true;
+        }
+
         RaycastHit hitInfo;
 
-        if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, 2) && backTire.isGrounded)
+        if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, 3) && backTire.isGrounded)
         {
-            Debug.DrawRay(transform.position, Vector3.down * 2, Color.blue);
-
             Vector3 surfaceNormal = hitInfo.normal;
             surfaceNormal.Normalize();
 

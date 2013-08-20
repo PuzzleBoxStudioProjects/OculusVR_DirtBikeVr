@@ -1,21 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DrewFrontTire : MonoBehaviour
+public class AIFrontTire : MonoBehaviour
 {
     public Transform bike;
     public Transform backTireTrans;
 
     private DrewBackTire backTire;
-    private DrewBikePhysics bikePhysics;
+    private BikeAI bikePhysics;
 
     private int layerMask = 1 << 8;
 
-	void Awake ()
+    void Awake()
     {
-        bikePhysics = bike.GetComponent<DrewBikePhysics>();
+        bikePhysics = bike.GetComponent<BikeAI>();
         backTire = backTireTrans.GetComponent<DrewBackTire>();
-	}
+    }
 
     void Start()
     {

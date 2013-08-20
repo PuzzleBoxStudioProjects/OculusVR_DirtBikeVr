@@ -17,7 +17,7 @@ public class DrewBikePhysics : MonoBehaviour
     public float flipAngle = 20.0f;
     public float wheelieAngle = 100.0f;
 
-    [HideInInspector]
+    //[HideInInspector]
     public float turboBar = 0.0f;
     public float turboBoostSpeed = 12.0f;
     public float maxTurboBar = 30.0f;
@@ -27,15 +27,13 @@ public class DrewBikePhysics : MonoBehaviour
     public Transform backTire;
 	public Transform frontTire;
     public Transform bikeBody;
-
-    public AudioClip rev;
-
-    [HideInInspector]
+    
+    //[HideInInspector]
     public bool hasCrashed = false;
 
-    [HideInInspector]
+    //[HideInInspector]
     public float accelFactor = 0.0f;
-    private float curMaxSpeed = 0.0f;
+    public float curMaxSpeed = 0.0f;
     private float vertVel = 0.0f;
 
     private bool isResetting = false;
@@ -80,17 +78,6 @@ public class DrewBikePhysics : MonoBehaviour
 
         GearShifts(gas);
 
-        //set max and min speeds
-        moveDir.z = Mathf.Clamp(moveDir.z, -minSpeed, accelFactor);
-        //apply speed values
-        moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
-
-        //moveDir = transform.TransformDirection(moveDir);
-        
-        //move
-        //rigidbody.velocity = moveDir;
-        transform.Translate(moveDir * Time.deltaTime);
-
         if (drewBackTire.isGrounded)
         {
             //turn the bike
@@ -106,19 +93,17 @@ public class DrewBikePhysics : MonoBehaviour
                 accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
             }
 
-            //accelerate
-            accelFactor = Mathf.MoveTowards(accelFactor, curMaxSpeed, gas * speed * Time.deltaTime);
-            //brake
-            accelFactor = Mathf.MoveTowards(accelFactor, 0, brake * brakeForce * Time.deltaTime);
-
-            if (isResetting)
+            if (!hasCrashed)
             {
-                isResetting = false;
+                //accelerate
+                accelFactor = Mathf.MoveTowards(accelFactor, curMaxSpeed, gas * speed * Time.deltaTime);
+                //brake
+                accelFactor = Mathf.MoveTowards(accelFactor, 0, brake * brakeForce * Time.deltaTime);
             }
         }
         else
         {
-            if (!isResetting && flipInput > 0)
+            if (!hasCrashed && flipInput > 0)
             {
                 //rotate bike for a flip
                 bikeBody.Rotate(Vector3.left * flipSpeed * flipInput * Time.deltaTime);
@@ -127,7 +112,7 @@ public class DrewBikePhysics : MonoBehaviour
             Physics.gravity = new Vector3(0, -14, 0);
         }
 
-        if (flipInput == 0 && !isResetting)
+        if (flipInput == 0 && !hasCrashed)
         {
             //reset bike's rotation
             bikeBody.localRotation = Quaternion.RotateTowards(bikeBody.localRotation, initRot, flipSpeed * Time.deltaTime);
@@ -144,15 +129,30 @@ public class DrewBikePhysics : MonoBehaviour
         //if crashed stop moving and reset rotation and reposition at the last checkpoint
         if (hasCrashed)
         {
-            isResetting = true;
-
             accelFactor = 0;
-            bikeBody.localRotation = initRot;
-            transform.rotation = checkPoints.currentCheckpoint.rotation;
-            transform.position = checkPoints.currentCheckpoint.position;
-
-            hasCrashed = false;
+            
+            if (!IsInvoking("Respawn"))
+            {
+                Invoke("Respawn", 2.0f);
+            }
         }
+
+        //set max and min speeds
+        moveDir.z = Mathf.Clamp(moveDir.z, 0, accelFactor);
+        //apply speed values
+        moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
+
+        //move
+        transform.Translate(moveDir * Time.deltaTime);
+    }
+
+    void Respawn()
+    {
+        bikeBody.localRotation = initRot;
+        transform.rotation = checkPoints.currentCheckpoint.rotation;
+        transform.position = checkPoints.currentCheckpoint.position;
+
+        hasCrashed = false;
     }
 
     void Turbo()
@@ -164,6 +164,7 @@ public class DrewBikePhysics : MonoBehaviour
             turboBar -= turboDepletionSpeed * Time.deltaTime;
             //set turbo speed
             curMaxSpeed = turboSpeed;
+            audio.pitch = 3;
         }
         else
         {
@@ -174,7 +175,22 @@ public class DrewBikePhysics : MonoBehaviour
 
     void GearShifts(float gasPressure)
     {
-        audio.pitch = Mathf.Abs(gasPressure * speed);
+        if (gasPressure != 0 && !Input.GetButton("Boost"))
+        {
+            audio.pitch = gasPressure * speed * Time.deltaTime;
+            if (audio.pitch < 0.5f)
+            {
+                audio.pitch = 0.5f;
+            }
+            if (audio.pitch > 1.5f)
+            {
+                audio.pitch = 1.5f;
+            }
+        }
+        if (gasPressure == 0)
+        {
+            audio.pitch = 0.5f;
+        }
     }
 
     //limit the angle
