@@ -28,10 +28,13 @@ public class DrewBikePhysics : MonoBehaviour
 	public Transform frontTire;
     public Transform bikeBody;
 
+    public AudioClip rev;
+
     [HideInInspector]
     public bool hasCrashed = false;
 
-    private float accelFactor = 0.0f;
+    [HideInInspector]
+    public float accelFactor = 0.0f;
     private float curMaxSpeed = 0.0f;
     private float vertVel = 0.0f;
 
@@ -74,7 +77,20 @@ public class DrewBikePhysics : MonoBehaviour
         float steer = Input.GetAxis("Horizontal");
         float flipInput = Input.GetAxis("RightAnalog");
         float brake = Input.GetAxis("LeftTrigger");
+
+        GearShifts(gas);
+
+        //set max and min speeds
+        moveDir.z = Mathf.Clamp(moveDir.z, -minSpeed, accelFactor);
+        //apply speed values
+        moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
+
+        //moveDir = transform.TransformDirection(moveDir);
         
+        //move
+        //rigidbody.velocity = moveDir;
+        transform.Translate(moveDir * Time.deltaTime);
+
         if (drewBackTire.isGrounded)
         {
             //turn the bike
@@ -117,17 +133,6 @@ public class DrewBikePhysics : MonoBehaviour
             bikeBody.localRotation = Quaternion.RotateTowards(bikeBody.localRotation, initRot, flipSpeed * Time.deltaTime);
         }
 
-        //set max and min speeds
-        moveDir.z = Mathf.Clamp(moveDir.z, -minSpeed, accelFactor);
-        //apply speed values
-        moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
-
-        moveDir = transform.TransformDirection(moveDir);
-        //move
-        //rigidbody.AddRelativeForce(moveDir, ForceMode.VelocityChange);
-        rigidbody.velocity = moveDir;
-        //transform.Translate(moveDir * Time.deltaTime);
-
         //bank the bike
         rotDir = new Vector3(rotDir.x, rotDir.y, Mathf.LerpAngle(transform.eulerAngles.z, -steerAngle * steer, 0.3f));
         //limit the x angle
@@ -165,6 +170,11 @@ public class DrewBikePhysics : MonoBehaviour
             //reset speed
             curMaxSpeed = maxSpeed;
         }
+    }
+
+    void GearShifts(float gasPressure)
+    {
+        audio.pitch = Mathf.Abs(gasPressure * speed);
     }
 
     //limit the angle

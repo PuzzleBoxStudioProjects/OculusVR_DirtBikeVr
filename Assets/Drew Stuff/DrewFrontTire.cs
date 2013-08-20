@@ -7,13 +7,20 @@ public class DrewFrontTire : MonoBehaviour
     public Transform backTireTrans;
 
     private DrewBackTire backTire;
-    private DrewBikePhysics bikePhysics;
+    private BikeAI bikePhysics;
+
+    private int layerMask = 1 << 8;
 
 	void Awake ()
     {
-        bikePhysics = bike.GetComponent<DrewBikePhysics>();
+        bikePhysics = bike.GetComponent<BikeAI>();
         backTire = backTireTrans.GetComponent<DrewBackTire>();
 	}
+
+    void Start()
+    {
+        layerMask = ~layerMask;
+    }
 
     void Update()
     {
@@ -22,9 +29,7 @@ public class DrewFrontTire : MonoBehaviour
 
     void CrashGroundCheck()
     {
-        RaycastHit hitInfo;
-
-        if (Physics.Raycast(transform.position, transform.forward, out hitInfo, 1) && !backTire.isGrounded)
+        if (Physics.Raycast(transform.position, transform.forward, 1, layerMask) && !backTire.isGrounded)
         {
             bikePhysics.hasCrashed = true;
         }
