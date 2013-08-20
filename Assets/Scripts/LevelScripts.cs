@@ -7,15 +7,17 @@ public class LevelScripts : MonoBehaviour {
 
 	public AudioClip[] clipHolder;
 	public GameObject[] lightHolder;
+	public GameObject[] gateHolder;
+	
 	public int currentPosition;
 	public int totalLaps;
 	public int lapsLeft = 0;
 	public int currentLap = 0;
 	
 	private float timeLength = 3.0f;
-	public float currentTime;
-	public bool playNext = false;
-	
+	private float lightTimer;
+	private bool  isGreen = false;
+	private int lightCount = 0;
 	public int clipCount = 0;
 	void Awake()
 	{
@@ -35,11 +37,23 @@ public class LevelScripts : MonoBehaviour {
 	 
 		if(Time.time > timeLength)
 		{			
-			if(clipCount < 3)
+			if(clipCount < 2)
 			{
 				timeLength = Time.time + clipHolder[clipCount].length;
 				audio.PlayOneShot(clipHolder[clipCount]);
 				clipCount++;
+			}
+			if(clipCount == 2)
+			{
+				timeLength = Time.time + clipHolder[clipCount].length;
+				audio.PlayOneShot(clipHolder[clipCount]);
+				if(!IsInvoking("LightActivation"))
+				{
+					InvokeRepeating("LightActivation", 0, 1.0f);
+					
+				}
+				
+		
 			}
 				
 			else if(clipCount == 3 )
@@ -63,5 +77,14 @@ public class LevelScripts : MonoBehaviour {
 			}
 		}
 	
+	}
+void LightActivation()
+	{
+		if(lightCount <= 3)
+		{
+			lightHolder[lightCount].SetActive(true);
+			
+		}
+		lightCount++
 	}
 }
