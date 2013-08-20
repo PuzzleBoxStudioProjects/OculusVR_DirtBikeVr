@@ -24,20 +24,27 @@ public class DrewBikePhysics : MonoBehaviour
     public Transform backTire;
 	public Transform frontTire;
     public Transform bikeBody;
+    public Transform crashDummyHead;
 
     private float accelFactor = 0.0f;
     private float curMaxSpeed = 0.0f;
-    
-    public Vector3 rotDir;
+
+    private bool isResetting = false;
+
+    private Vector3 rotDir;
     private Vector3 moveDir;
 
-    public Quaternion initRot;
+    private Quaternion initRot;
 
+    private CrashDummy crashDummy;
     private DrewBackTire drewBackTire;
+    private CheckPoints checkPoints;
 
     void Awake()
     {
         drewBackTire = backTire.GetComponent<DrewBackTire>();
+        crashDummy = crashDummyHead.GetComponent<CrashDummy>();
+        checkPoints = GetComponent<CheckPoints>();
     }
 
     void Start()
@@ -81,21 +88,29 @@ public class DrewBikePhysics : MonoBehaviour
                 //deccelerate
                 accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
             }
+
+            if (isResetting)
+            {
+                isResetting = false;
+            }
         }
         else
         {
-            //rotate bike for a flip
-            bikeBody.Rotate(Vector3.right * flipSpeed * flipInput * Time.deltaTime);
+            if (!isResetting)
+            {
+                //rotate bike for a flip
+                bikeBody.Rotate(Vector3.right * flipSpeed * flipInput * Time.deltaTime);
+            }
             //make gravity stronger
             Physics.gravity = new Vector3(0, -14, 0);
         }
 
-        if (flipInput == 0)
+        if (flipInput == 0 && !isResetting)
         {
-            //reset bike's rotation when not flipping
+            //reset bike's rotation
             bikeBody.localRotation = Quaternion.RotateTowards(bikeBody.localRotation, initRot, flipSpeed * Time.deltaTime);
         }
-        
+
         //set max and min speeds
         moveDir.z = Mathf.Clamp(moveDir.z, -minSpeed, accelFactor);
         //apply speed values
@@ -111,6 +126,19 @@ public class DrewBikePhysics : MonoBehaviour
 
         //apply the rotation values
         transform.eulerAngles = rotDir;
+
+        //if crashed stop moving and reset rotation and reposition at the last checkpoint
+        if (crashDummy.hasCrashed)
+        {
+            isResetting = true;
+
+            accelFactor = 0;
+            bikeBody.localRotation = initRot;
+            transform.rotation = checkPoints.currentCheckpoint.rotation;
+            transform.position = checkPoints.currentCheckpoint.position;
+
+            crashDummy.hasCrashed = false;
+        }
     }
 
     void Turbo()
