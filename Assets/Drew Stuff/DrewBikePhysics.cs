@@ -46,6 +46,8 @@ public class DrewBikePhysics : MonoBehaviour
     private DrewBackTire drewBackTire;
     private CheckPoints checkPoints;
 
+    private int layerMask = 1 << 8;
+
     void Awake()
     {
         drewBackTire = backTire.GetComponent<DrewBackTire>();
@@ -65,6 +67,7 @@ public class DrewBikePhysics : MonoBehaviour
     {
         Movement();
         Turbo();
+        CheckBarriers();
 	}
     
     void Movement()
@@ -170,6 +173,20 @@ public class DrewBikePhysics : MonoBehaviour
         {
             //reset speed
             curMaxSpeed = maxSpeed;
+        }
+    }
+
+    void CheckBarriers()
+    {
+        RaycastHit hitInfo;
+
+        if (Physics.SphereCast(transform.position, transform.localScale.y / 2, transform.right, out hitInfo, 3, layerMask) || Physics.SphereCast(transform.position, transform.localScale.y / 2, -transform.right, out hitInfo, 3, layerMask))
+        {
+            moveDir.x = 0;
+        }
+        if (Physics.Raycast(transform.position, transform.forward, out hitInfo, 3, layerMask))
+        {
+            accelFactor = 0;
         }
     }
 
