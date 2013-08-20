@@ -5,13 +5,7 @@ public class DrewBackTire : MonoBehaviour
 {
     //[HideInInspector]
     public bool isGrounded = false;
-
-	// Use this for initialization
-	void Start ()
-    {
-	
-	}
-
+    
     void LateUpdate()
     {
         RaycastHit hitInfo;

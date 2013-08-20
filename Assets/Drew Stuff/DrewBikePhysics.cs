@@ -4,12 +4,15 @@ using System.Collections;
 public class DrewBikePhysics : MonoBehaviour
 {
     public float speed = 10.0f;
+    public float brakeForce = 40.0f;
     public float maxSpeed = 20.0f;
     public float minSpeed = 10.0f;
     public float steerSpeed = 10.0f;
     public float steerAngle = 30.0f;
     public float deccelSpeed = 3.0f;
     public float flipSpeed = 5.0f;
+
+    public float gravity = 20.0f;
 
     public float flipAngle = 20.0f;
     public float wheelieAngle = 100.0f;
@@ -24,26 +27,27 @@ public class DrewBikePhysics : MonoBehaviour
     public Transform backTire;
 	public Transform frontTire;
     public Transform bikeBody;
-    public Transform crashDummyHead;
+
+    [HideInInspector]
+    public bool hasCrashed = false;
 
     private float accelFactor = 0.0f;
     private float curMaxSpeed = 0.0f;
+    private float vertVel = 0.0f;
 
     private bool isResetting = false;
 
     private Vector3 rotDir;
-    private Vector3 moveDir;
+    public Vector3 moveDir;
 
     private Quaternion initRot;
 
-    private CrashDummy crashDummy;
     private DrewBackTire drewBackTire;
     private CheckPoints checkPoints;
 
     void Awake()
     {
         drewBackTire = backTire.GetComponent<DrewBackTire>();
-        crashDummy = crashDummyHead.GetComponent<CrashDummy>();
         checkPoints = GetComponent<CheckPoints>();
     }
 
@@ -66,9 +70,11 @@ public class DrewBikePhysics : MonoBehaviour
     {
         //get inputs
         float forwardInput = Input.GetAxis("Vertical");
+        float gas = Input.GetAxis("RightTrigger");
         float steer = Input.GetAxis("Horizontal");
-        float flipInput = Input.GetAxis("Flip");
-
+        float flipInput = Input.GetAxis("RightAnalog");
+        float brake = Input.GetAxis("LeftTrigger");
+        
         if (drewBackTire.isGrounded)
         {
             //turn the bike
@@ -78,16 +84,16 @@ public class DrewBikePhysics : MonoBehaviour
             //reset gravity
             Physics.gravity = new Vector3(0, -9.81f, 0);
 
-            if (forwardInput != 0)
+            if (gas == 0)
             {
-                //accelerate
-                accelFactor = Mathf.MoveTowards(accelFactor, curMaxSpeed, forwardInput * speed * Time.deltaTime);
-            }
-            else
-            {
-                //deccelerate
+                //slow to a stop with no input
                 accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
             }
+
+            //accelerate
+            accelFactor = Mathf.MoveTowards(accelFactor, curMaxSpeed, gas * speed * Time.deltaTime);
+            //brake
+            accelFactor = Mathf.MoveTowards(accelFactor, 0, brake * brakeForce * Time.deltaTime);
 
             if (isResetting)
             {
@@ -96,10 +102,10 @@ public class DrewBikePhysics : MonoBehaviour
         }
         else
         {
-            if (!isResetting)
+            if (!isResetting && flipInput > 0)
             {
                 //rotate bike for a flip
-                bikeBody.Rotate(Vector3.right * flipSpeed * flipInput * Time.deltaTime);
+                bikeBody.Rotate(Vector3.left * flipSpeed * flipInput * Time.deltaTime);
             }
             //make gravity stronger
             Physics.gravity = new Vector3(0, -14, 0);
@@ -116,8 +122,11 @@ public class DrewBikePhysics : MonoBehaviour
         //apply speed values
         moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
 
+        moveDir = transform.TransformDirection(moveDir);
         //move
-        transform.Translate(moveDir * Time.deltaTime);
+        //rigidbody.AddRelativeForce(moveDir, ForceMode.VelocityChange);
+        rigidbody.velocity = moveDir;
+        //transform.Translate(moveDir * Time.deltaTime);
 
         //bank the bike
         rotDir = new Vector3(rotDir.x, rotDir.y, Mathf.LerpAngle(transform.eulerAngles.z, -steerAngle * steer, 0.3f));
@@ -128,7 +137,7 @@ public class DrewBikePhysics : MonoBehaviour
         transform.eulerAngles = rotDir;
 
         //if crashed stop moving and reset rotation and reposition at the last checkpoint
-        if (crashDummy.hasCrashed)
+        if (hasCrashed)
         {
             isResetting = true;
 
@@ -137,14 +146,14 @@ public class DrewBikePhysics : MonoBehaviour
             transform.rotation = checkPoints.currentCheckpoint.rotation;
             transform.position = checkPoints.currentCheckpoint.position;
 
-            crashDummy.hasCrashed = false;
+            hasCrashed = false;
         }
     }
 
     void Turbo()
     {
         //activate turbo
-        if (Input.GetButton("Jump") && turboBar > 0)
+        if (Input.GetButton("Boost") && turboBar > 0)
         {
             //deplete turbo
             turboBar -= turboDepletionSpeed * Time.deltaTime;

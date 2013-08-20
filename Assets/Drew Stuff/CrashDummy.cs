@@ -3,13 +3,20 @@ using System.Collections;
 
 public class CrashDummy : MonoBehaviour
 {
-    public bool hasCrashed = false;
-    
+    public Transform bike;
+
+    private DrewBikePhysics bikePhysics;
+
+    void Awake()
+    {
+        bikePhysics = bike.GetComponent<DrewBikePhysics>();
+    }
+
     void OnTriggerEnter(Collider col)
     {
         if (col.transform.name == "LevelTerrain")
         {
-            hasCrashed = true;
+            bikePhysics.hasCrashed = true;
         }
     }
 }
