@@ -48,11 +48,11 @@ public class CamLogic : MonoBehaviour
                     //set current stand we are looking at
                     crowd = allCrowds[i];
 
-                    if (Time.timeScale == 1.0f)
-                    {
-                        //slow time
-                        Time.timeScale = 0.4f;
-                    }
+                    //if (Time.timeScale == 1.0f)
+                    //{
+                    //    //slow time
+                    //    Time.timeScale = 0.4f;
+                    //}
                     //Time.fixedDeltaTime = 0.02f * Time.timeScale;
                     //apply turbo
                     if (bikePhysics.turboBar < bikePhysics.maxTurboBar)
@@ -65,10 +65,10 @@ public class CamLogic : MonoBehaviour
                 //looking away from stands
                 if (Vector3.Dot(transform.forward, oldCrowdPos.normalized) < 0.2f)
                 {
-                    if (Time.timeScale != 1.0f)
-                    {
-                        Time.timeScale = 1.0f;
-                    }
+                    //if (Time.timeScale != 1.0f)
+                    //{
+                    //    Time.timeScale = 1.0f;
+                    //}
                     //Time.fixedDeltaTime = 0.02f * Time.timeScale;
                 }
             }

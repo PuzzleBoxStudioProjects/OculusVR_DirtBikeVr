@@ -77,7 +77,7 @@ public class BikeAI : MonoBehaviour
             accelFactor = Mathf.MoveTowards(accelFactor, curSpeed, forwardSpeed * Time.deltaTime);
         }
                 
-        if (curTarget <= allTargets.Count - 1)
+        if (curTarget < allTargets.Count - 1)
         {
             Vector3 dir = allTargets[curTarget].transform.position - transform.position;
             float dist = Vector3.Distance(allTargets[curTarget].transform.position, transform.position);
@@ -89,14 +89,18 @@ public class BikeAI : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), rotSpeed * Time.deltaTime);
         }
 
-        if (curTarget == allTargets.Count)
+        else
         {
-            accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
+            curTarget = 0;
+            //accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
             //agent.autoBraking = true;
         }
         
         moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
-        transform.Translate(moveDir * Time.deltaTime);
+        if (LevelScripts.isGreen)
+        {
+            transform.Translate(moveDir * Time.deltaTime);
+        }
     }
 
     void Respawn()
