@@ -80,7 +80,7 @@ public class DrewBikePhysics : MonoBehaviour
         {
             if (Time.timeScale == 1)
             {
-                Time.timeScale = 0.3f;
+                Time.timeScale = .65f;
             }
         }
         else
@@ -187,7 +187,7 @@ public class DrewBikePhysics : MonoBehaviour
         
         //move
         //rigidbody.velocity = transform.TransformDirection(moveDir);
-        if (!LevelScripts.isGreen)
+        if (LevelScripts.isGreen)
         {
             transform.Translate(moveDir * Time.deltaTime);
         }

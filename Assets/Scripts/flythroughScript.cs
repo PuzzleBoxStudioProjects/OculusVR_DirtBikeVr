@@ -4,6 +4,7 @@ using System.Collections;
 public class flythroughScript : MonoBehaviour {
 	
 	public bool firstpass = true;
+	public float waitTimer = 20.0f;
 	public GameObject thisCamera;
 	public GameObject theRoot;
 	public GameObject theBike;
@@ -16,14 +17,18 @@ public class flythroughScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
-		if(thisCamera.transform.position == theRoot.transform.position && ! firstpass )
-		{
-			thisCamera.gameObject.SetActive(false);
-			theBike.gameObject.SetActive(true);
-		}
-		else
-		{
-			firstpass = false;
-		}
+	if(!IsInvoking("Flythrough"))
+				{
+					Invoke("Flythrough", waitTimer);
+					
+				}	
 	}
+
+
+void Flythrough()
+{
+	theBike.gameObject.SetActive(true);
+	thisCamera.gameObject.SetActive(false);
+
+}
 }
