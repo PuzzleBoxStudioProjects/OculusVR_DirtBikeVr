@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class BikeAI : MonoBehaviour
 {
     public List<GameObject> allTargets;
-    public int curTarget;
+    private int curTarget;
 
     public float rotSpeed = 20.0f;
     public float forwardSpeed = 22.0f;
@@ -86,7 +86,6 @@ public class BikeAI : MonoBehaviour
             {
                 curTarget++;
             }
-
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), rotSpeed * Time.deltaTime);
         }
 
