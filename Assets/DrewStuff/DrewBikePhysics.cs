@@ -35,8 +35,7 @@ public class DrewBikePhysics : MonoBehaviour
     public float accelFactor = 0.0f;
     public float curMaxSpeed = 0.0f;
     private float vertVel = 10.0f;
-    private float brake = 0.0f;
-    private float gas = 0.0f;
+    public float distFromGround = 5.0f;
 
     private bool hasCollidedBarrier = false;
 
@@ -70,7 +69,28 @@ public class DrewBikePhysics : MonoBehaviour
     {
         Movement();
         Turbo();
+        HeightControl();
 	}
+
+    void HeightControl()
+    {
+        RaycastHit hitInfo;
+
+        if (!Physics.Raycast(transform.position, Vector3.down, out hitInfo, distFromGround))
+        {
+            if (Time.timeScale == 1)
+            {
+                Time.timeScale = 0.3f;
+            }
+        }
+        else
+        {
+            if (Time.timeScale != 1)
+            {
+                Time.timeScale = 1;
+            }
+        }
+    }
 
     void Movement()
     {
@@ -167,7 +187,10 @@ public class DrewBikePhysics : MonoBehaviour
         
         //move
         //rigidbody.velocity = transform.TransformDirection(moveDir);
-        transform.Translate(moveDir * Time.deltaTime);
+        if (!LevelScripts.isGreen)
+        {
+            transform.Translate(moveDir * Time.deltaTime);
+        }
         //RaycastHit hitInfo;
 
         //if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, 2))
