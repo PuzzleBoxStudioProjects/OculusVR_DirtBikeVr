@@ -20,6 +20,8 @@ public class BikeAI : MonoBehaviour
     public float accelFactor = 0.0f;
     private float curSpeed = 0.0f;
 
+    public int steerDir = 1;
+
     private Quaternion initRot;
 
     private Vector3 moveDir;
@@ -74,18 +76,17 @@ public class BikeAI : MonoBehaviour
         {
             accelFactor = Mathf.MoveTowards(accelFactor, curSpeed, forwardSpeed * Time.deltaTime);
         }
-        
-        
-        
+                
         if (curTarget <= allTargets.Count - 1)
         {
             Vector3 dir = allTargets[curTarget].transform.position - transform.position;
             float dist = Vector3.Distance(allTargets[curTarget].transform.position, transform.position);
-            
+
             if (dist < 5)
             {
                 curTarget++;
             }
+
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), rotSpeed * Time.deltaTime);
         }
 
@@ -97,7 +98,6 @@ public class BikeAI : MonoBehaviour
         
         moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
         transform.Translate(moveDir * Time.deltaTime);
-        //rigidbody.velocity = transform.TransformDirection(moveDir);
     }
 
     void Respawn()

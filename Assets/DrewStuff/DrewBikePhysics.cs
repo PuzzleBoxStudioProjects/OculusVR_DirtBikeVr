@@ -83,8 +83,6 @@ public class DrewBikePhysics : MonoBehaviour
 
         GearShifts(gasInput);
 
-        print(forwardInput);
-
         if (drewBackTire.isGrounded)
         {
             //turn the bike
