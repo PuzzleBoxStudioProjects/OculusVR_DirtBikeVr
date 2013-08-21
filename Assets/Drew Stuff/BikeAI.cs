@@ -3,24 +3,32 @@ using System.Collections.Generic;
 
 public class BikeAI : MonoBehaviour
 {
-    public float rampLimit = 5.0f;
-    public float rampMag = 0.4f;
-
     public List<GameObject> allTargets;
-    public GameObject finishTarget;
     public int curTarget;
+
+    public float rotSpeed = 20.0f;
+    public float forwardSpeed = 22.0f;
+    public float maxSpeed = 25.0f;
+    public float steerAngle = 10.0f;
+    public float deccelSpeed = 40.0f;
 
     public Transform backTireTrans;
     public Transform bikeBody;
 
     public bool hasCrashed = false;
 
+    public float accelFactor = 0.0f;
+    private float curSpeed = 0.0f;
+
     private Quaternion initRot;
+
+    private Vector3 moveDir;
+    private Vector3 rotDir;
 
     private CheckPoints checkPoints;
     private DrewBackTire backTire;
 
-    private NavMeshAgent agent;
+    //private NavMeshAgent agent;
 
     void Awake()
     {
@@ -31,17 +39,17 @@ public class BikeAI : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        agent = GetComponent<NavMeshAgent>();
+        //agent = GetComponent<NavMeshAgent>();
 
-        agent.autoBraking = false;
+        //agent.autoBraking = false;
 
-        allTargets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Checkpoint"));
-        allTargets.Add(finishTarget);
+        allTargets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Waypoint"));
+        //allTargets.Add(finishTarget);
 
         allTargets.Sort(delegate(GameObject a1, GameObject a2) { return a1.name.CompareTo(a2.name); });
 
-        agent.destination = allTargets[curTarget].transform.position;
-
+        //agent.destination = allTargets[curTarget].transform.position;
+        curSpeed = maxSpeed;
         initRot = bikeBody.rotation;
 	}
 	
@@ -55,40 +63,80 @@ public class BikeAI : MonoBehaviour
     {
         if (hasCrashed)
         {
-            //isResetting = true;
+            accelFactor = 0;
 
-            //accelFactor = 0;
-            bikeBody.localRotation = initRot;
-            transform.rotation = checkPoints.currentCheckpoint.rotation;
-            transform.position = checkPoints.currentCheckpoint.position;
-
-            hasCrashed = false;
+            if (!IsInvoking("Respawn"))
+            {
+                Invoke("Respawn", 0);
+            }
         }
-
-        if (curTarget < allTargets.Count - 1)
+        else
         {
+            accelFactor = Mathf.MoveTowards(accelFactor, curSpeed, forwardSpeed * Time.deltaTime);
+        }
+        
+        
+        
+        if (curTarget <= allTargets.Count - 1)
+        {
+            Vector3 dir = allTargets[curTarget].transform.position - transform.position;
             float dist = Vector3.Distance(allTargets[curTarget].transform.position, transform.position);
-
-            if (dist < 20)
+            
+            if (dist < 5)
             {
                 curTarget++;
-                agent.destination = allTargets[curTarget].transform.position;
             }
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), rotSpeed * Time.deltaTime);
         }
 
         if (curTarget == allTargets.Count)
         {
-            agent.autoBraking = true;
+            accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
+            //agent.autoBraking = true;
         }
+        
+        moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
+        transform.Translate(moveDir * Time.deltaTime);
+        //rigidbody.velocity = transform.TransformDirection(moveDir);
+    }
 
-        RaycastHit hitInfo;
+    void Respawn()
+    {
+        bikeBody.localRotation = initRot;
+        transform.rotation = checkPoints.currentCheckpoint.rotation;
+        transform.position = checkPoints.currentCheckpoint.position;
 
-        if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, 3) && backTire.isGrounded)
+        hasCrashed = false;
+    }
+
+    //limit the angle
+    float ClampAngle(float angle, float limit)
+    {
+        if (angle > 180)
         {
-            Vector3 surfaceNormal = hitInfo.normal;
-            surfaceNormal.Normalize();
+            float angleB = 360 - angle;
 
-            transform.rotation = Quaternion.FromToRotation(transform.up, surfaceNormal) * transform.rotation;
+            if (angleB > limit)
+            {
+                angle = 360 - limit;
+            }
+            else
+            {
+                return angle;
+            }
         }
+        if (angle < 180)
+        {
+            if (angle > limit && angle < 360 - limit)
+            {
+                angle = limit;
+            }
+            else
+            {
+                return angle;
+            }
+        }
+
+        return angle;
     }
 }

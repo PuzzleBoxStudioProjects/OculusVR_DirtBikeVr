@@ -34,12 +34,15 @@ public class DrewBikePhysics : MonoBehaviour
     //[HideInInspector]
     public float accelFactor = 0.0f;
     public float curMaxSpeed = 0.0f;
-    private float vertVel = 0.0f;
+    private float vertVel = 10.0f;
+    private float brake = 0.0f;
+    private float gas = 0.0f;
 
-    private bool isResetting = false;
+    private bool hasCollidedBarrier = false;
 
     private Vector3 rotDir;
-    public Vector3 moveDir;
+    private Vector3 moveDir;
+    private Vector3 lastPos;
 
     private Quaternion initRot;
 
@@ -67,19 +70,20 @@ public class DrewBikePhysics : MonoBehaviour
     {
         Movement();
         Turbo();
-        CheckBarriers();
 	}
-    
+
     void Movement()
     {
         //get inputs
         float forwardInput = Input.GetAxis("Vertical");
-        float gas = Input.GetAxis("RightTrigger");
+        float gasInput = Input.GetAxis("RightTrigger");
         float steer = Input.GetAxis("Horizontal");
         float flipInput = Input.GetAxis("RightAnalog");
-        float brake = Input.GetAxis("LeftTrigger");
+        float brakeInput = Input.GetAxis("LeftTrigger");
 
-        GearShifts(gas);
+        GearShifts(gasInput);
+
+        print(forwardInput);
 
         if (drewBackTire.isGrounded)
         {
@@ -89,8 +93,9 @@ public class DrewBikePhysics : MonoBehaviour
             //bikeBody.localRotation = Quaternion.RotateTowards(bikeBody.localRotation, Quaternion.Euler(wheelieAngle, 0, 0), flipSpeed * Time.deltaTime);
             //reset gravity
             Physics.gravity = new Vector3(0, -9.81f, 0);
+            vertVel = 0;
 
-            if (gas == 0)
+            if (gasInput == 0)
             {
                 //slow to a stop with no input
                 accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
@@ -98,10 +103,26 @@ public class DrewBikePhysics : MonoBehaviour
 
             if (!hasCrashed)
             {
-                //accelerate
-                accelFactor = Mathf.MoveTowards(accelFactor, curMaxSpeed, gas * speed * Time.deltaTime);
-                //brake
-                accelFactor = Mathf.MoveTowards(accelFactor, 0, brake * brakeForce * Time.deltaTime);
+                if (gasInput != 0)
+                {
+                    //accelerate
+                    accelFactor = Mathf.MoveTowards(accelFactor, curMaxSpeed, gasInput * speed * Time.deltaTime);
+                }
+                if (brakeInput != 0)
+                {
+                    //brake
+                    accelFactor = Mathf.MoveTowards(accelFactor, 0, brakeInput * brakeForce * Time.deltaTime);   
+                }
+                if (forwardInput > 0)
+                {
+                    //accelerate
+                    accelFactor = Mathf.MoveTowards(accelFactor, curMaxSpeed, forwardInput * speed * Time.deltaTime);
+                }
+                if (forwardInput < 0)
+                {
+                    //brake
+                    accelFactor = Mathf.MoveTowards(accelFactor, 0, forwardInput * -brakeForce * Time.deltaTime);   
+                }
             }
         }
         else
@@ -112,7 +133,8 @@ public class DrewBikePhysics : MonoBehaviour
                 bikeBody.Rotate(Vector3.left * flipSpeed * flipInput * Time.deltaTime);
             }
             //make gravity stronger
-            Physics.gravity = new Vector3(0, -14, 0);
+            Physics.gravity = new Vector3(0, -20, 0);
+            vertVel = -30;
         }
 
         if (flipInput == 0 && !hasCrashed)
@@ -144,17 +166,28 @@ public class DrewBikePhysics : MonoBehaviour
         moveDir.z = Mathf.Clamp(moveDir.z, 0, accelFactor);
         //apply speed values
         moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
-
+        
         //move
+        //rigidbody.velocity = transform.TransformDirection(moveDir);
         transform.Translate(moveDir * Time.deltaTime);
+        //RaycastHit hitInfo;
+
+        //if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, 2))
+        //{
+        //    Vector3 surfaceNormal = hitInfo.normal;
+        //    surfaceNormal.Normalize();
+
+        //    transform.rotation = Quaternion.FromToRotation(transform.up, surfaceNormal) * transform.rotation;
+        //}
     }
 
     void Respawn()
     {
-        bikeBody.localRotation = initRot;
         transform.rotation = checkPoints.currentCheckpoint.rotation;
         transform.position = checkPoints.currentCheckpoint.position;
 
+        bikeBody.localRotation = initRot;
+        
         hasCrashed = false;
     }
 
@@ -176,20 +209,6 @@ public class DrewBikePhysics : MonoBehaviour
         }
     }
 
-    void CheckBarriers()
-    {
-        RaycastHit hitInfo;
-
-        if (Physics.SphereCast(transform.position, transform.localScale.y / 2, transform.right, out hitInfo, 3, layerMask) || Physics.SphereCast(transform.position, transform.localScale.y / 2, -transform.right, out hitInfo, 3, layerMask))
-        {
-            moveDir.x = 0;
-        }
-        if (Physics.Raycast(transform.position, transform.forward, out hitInfo, 3, layerMask))
-        {
-            accelFactor = 0;
-        }
-    }
-
     void GearShifts(float gasPressure)
     {
         if (gasPressure != 0 && !Input.GetButton("Boost"))
@@ -207,6 +226,15 @@ public class DrewBikePhysics : MonoBehaviour
         if (gasPressure == 0)
         {
             audio.pitch = 0.5f;
+        }
+    }
+
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.transform.tag == "Barrier")
+        {
+            accelFactor = 0;
+            Respawn();
         }
     }
 
