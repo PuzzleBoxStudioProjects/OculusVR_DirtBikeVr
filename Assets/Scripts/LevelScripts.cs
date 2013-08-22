@@ -25,13 +25,7 @@ public class LevelScripts : MonoBehaviour
 	private float currTimer = 0.0f;
 	private float prevTimer = 0.0f;
 	public float showTimer = 0.0f;
-	void Awake()
-	{
-	  
-	}
-	
-	
-	// Use this for initialization
+
 	void Start () 
 	{
 	  timeLength += Time.time;

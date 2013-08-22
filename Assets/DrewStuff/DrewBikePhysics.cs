@@ -76,11 +76,11 @@ public class DrewBikePhysics : MonoBehaviour
     {
         RaycastHit hitInfo;
 
-        if (!Physics.Raycast(transform.position, Vector3.down, out hitInfo, distFromGround))
+        if (!Physics.Raycast(transform.position, Vector3.down, out hitInfo, distFromGround)&& LevelScripts.isGreen)
         {
             if (Time.timeScale == 1)
             {
-                Time.timeScale = 0.3f;
+                Time.timeScale = .65f;
             }
         }
         else
@@ -151,8 +151,8 @@ public class DrewBikePhysics : MonoBehaviour
                 bikeBody.Rotate(Vector3.left * flipSpeed * flipInput * Time.deltaTime);
             }
             //make gravity stronger
-            Physics.gravity = new Vector3(0, -20, 0);
-            vertVel = -30;
+            Physics.gravity = new Vector3(0, -18, 0);
+            vertVel = -25;
         }
 
         if (flipInput == 0 && !hasCrashed)
@@ -187,7 +187,7 @@ public class DrewBikePhysics : MonoBehaviour
         
         //move
         //rigidbody.velocity = transform.TransformDirection(moveDir);
-        if (!LevelScripts.isGreen)
+        if (LevelScripts.isGreen)
         {
             transform.Translate(moveDir * Time.deltaTime);
         }
