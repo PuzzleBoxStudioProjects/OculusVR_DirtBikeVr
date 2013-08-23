@@ -48,21 +48,15 @@ function Update()
         {
        
         // starts game.
-        if ( hit.collider.name == "startCube")
+        if ( hit.collider.name == "controllerCube")
          {
-         	print("hit startcube");
-         	Application.LoadLevel(2);
+         	
+         	Application.LoadLevel(4);
          }
-         // loads controller guide
-         if (hit.collider.name == "howToCube")
-         {
-         	Application.LoadLevel(1);
-         } 
          // loads how to pla
-         if (hit.collider.name == "exitCube")
+         if (hit.collider.name == "mainCube")
          {
-         	print("Just Quit");
-         	// Application.Quit();
+         	Application.LoadLevel(0);
          } 
        
         }
