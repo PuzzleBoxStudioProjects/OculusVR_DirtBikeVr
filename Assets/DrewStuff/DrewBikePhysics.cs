@@ -101,7 +101,7 @@ public class DrewBikePhysics : MonoBehaviour
         float flipInput = Input.GetAxis("RightAnalog");
         float brakeInput = Input.GetAxis("LeftTrigger");
 
-        GearShifts(gasInput);
+        GearShifts(gasInput, forwardInput);
 
         if (drewBackTire.isGrounded)
         {
@@ -111,9 +111,8 @@ public class DrewBikePhysics : MonoBehaviour
             //bikeBody.localRotation = Quaternion.RotateTowards(bikeBody.localRotation, Quaternion.Euler(wheelieAngle, 0, 0), flipSpeed * Time.deltaTime);
             //reset gravity
             Physics.gravity = new Vector3(0, -9.81f, 0);
-            vertVel = 0;
 
-            if (gasInput == 0)
+            if (gasInput == 0 && forwardInput == 0)
             {
                 //slow to a stop with no input
                 accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
@@ -150,17 +149,36 @@ public class DrewBikePhysics : MonoBehaviour
                 //rotate bike for a flip
                 bikeBody.Rotate(Vector3.left * flipSpeed * flipInput * Time.deltaTime);
             }
+            if (Input.GetKey(KeyCode.DownArrow) && !hasCrashed)
+            {
+                bikeBody.Rotate(Vector3.left * flipSpeed * Time.deltaTime);
+            }
             //make gravity stronger
             Physics.gravity = new Vector3(0, -18, 0);
-            vertVel = -25;
         }
 
-        if (flipInput == 0 && !hasCrashed)
+        //if crashed stop moving and reset rotation and reposition at the last checkpoint
+        if (hasCrashed)
         {
-            //reset bike's rotation
-            bikeBody.localRotation = Quaternion.RotateTowards(bikeBody.localRotation, initRot, flipSpeed * Time.deltaTime);
-        }
+            accelFactor = 0;
 
+            if (!IsInvoking("Respawn"))
+            {
+                Invoke("Respawn", 2.0f);
+            }
+        }
+        else
+        {
+            if ((flipInput == 0 || Input.GetKeyUp(KeyCode.DownArrow)))
+            {
+                //reset bike's rotation
+                bikeBody.localRotation = Quaternion.RotateTowards(bikeBody.localRotation, initRot, flipSpeed * Time.deltaTime);
+            }
+        }
+        //set max and min speeds
+        moveDir.z = Mathf.Clamp(moveDir.z, 0, accelFactor);
+        //apply speed values
+        moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
         //bank the bike
         rotDir = new Vector3(rotDir.x, rotDir.y, Mathf.LerpAngle(transform.eulerAngles.z, -steerAngle * steer, 0.3f));
         //limit the x angle
@@ -169,25 +187,9 @@ public class DrewBikePhysics : MonoBehaviour
         //apply the rotation values
         transform.eulerAngles = rotDir;
 
-        //if crashed stop moving and reset rotation and reposition at the last checkpoint
-        if (hasCrashed)
-        {
-            accelFactor = 0;
-            
-            if (!IsInvoking("Respawn"))
-            {
-                Invoke("Respawn", 2.0f);
-            }
-        }
-
-        //set max and min speeds
-        moveDir.z = Mathf.Clamp(moveDir.z, 0, accelFactor);
-        //apply speed values
-        moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
-        
         //move
         //rigidbody.velocity = transform.TransformDirection(moveDir);
-        if (LevelScripts.isGreen)
+        if (!LevelScripts.isGreen)
         {
             transform.Translate(moveDir * Time.deltaTime);
         }
@@ -204,7 +206,7 @@ public class DrewBikePhysics : MonoBehaviour
 
     void Respawn()
     {
-        transform.rotation = checkPoints.currentCheckpoint.rotation;
+        rotDir = checkPoints.currentCheckpoint.eulerAngles;
         transform.position = checkPoints.currentCheckpoint.position;
 
         bikeBody.localRotation = initRot;
@@ -215,7 +217,7 @@ public class DrewBikePhysics : MonoBehaviour
     void Turbo()
     {
         //activate turbo
-        if (Input.GetButton("Boost") && turboBar > 0)
+        if ((Input.GetButton("Boost") || Input.GetButton("Jump")) && turboBar > 0)
         {
             //deplete turbo
             turboBar -= turboDepletionSpeed * Time.deltaTime;
@@ -230,11 +232,18 @@ public class DrewBikePhysics : MonoBehaviour
         }
     }
 
-    void GearShifts(float gasPressure)
+    void GearShifts(float padInput, float keyboardInput)
     {
-        if (gasPressure != 0 && !Input.GetButton("Boost"))
+        if (!Input.GetButton("Boost") || !Input.GetButton("Jump"))
         {
-            audio.pitch = gasPressure * speed * Time.deltaTime;
+            if (padInput != 0)
+            {
+                audio.pitch = padInput * speed * Time.deltaTime;
+            }
+            if (keyboardInput != 0)
+            {
+                audio.pitch = keyboardInput * speed * Time.deltaTime;
+            }
             if (audio.pitch < 0.5f)
             {
                 audio.pitch = 0.5f;
@@ -244,7 +253,7 @@ public class DrewBikePhysics : MonoBehaviour
                 audio.pitch = 1.5f;
             }
         }
-        if (gasPressure == 0)
+        if (padInput == 0 && keyboardInput == 0)
         {
             audio.pitch = 0.5f;
         }
