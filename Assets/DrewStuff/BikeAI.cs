@@ -64,7 +64,7 @@ public class BikeAI : MonoBehaviour
                 Invoke("Respawn", 0);
             }
         }
-        else
+        else if (LevelScripts.isGreen)
         {
             accelFactor = Mathf.MoveTowards(accelFactor, curSpeed, forwardSpeed * Time.deltaTime);
         }
@@ -88,7 +88,8 @@ public class BikeAI : MonoBehaviour
         }
         
         moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
-        if (!LevelScripts.isGreen)
+
+        if (LevelScripts.isGreen)
         {
             transform.Translate(moveDir * Time.deltaTime);
         }

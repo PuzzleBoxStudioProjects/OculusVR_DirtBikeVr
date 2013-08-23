@@ -21,7 +21,11 @@ public class flythroughScript : MonoBehaviour {
 				{
 					Invoke("Flythrough", waitTimer);
 					
-				}	
+				}
+    if (Input.GetButtonDown("Trick2"))
+    {
+        Flythrough();
+    }
 	}
 
 

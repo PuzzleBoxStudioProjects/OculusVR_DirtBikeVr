@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 public class CamLogic : MonoBehaviour
 {
-    public GameObject[] allCrowds;
-    public GameObject crowd;
+    private GameObject[] allCrowds;
+    private GameObject crowd;
 
     public Transform bike;
 
@@ -32,8 +32,6 @@ public class CamLogic : MonoBehaviour
         {
             //get direction to current crowd
             Vector3 dirToCrowd = allCrowds[i].transform.position - transform.position;
-            //get forward direction
-            Vector3 forwardDir = transform.TransformDirection(Vector3.forward);
             //closest distance to crowd
             float crowdDist = Vector3.Distance(allCrowds[i].transform.position, transform.position);
 
@@ -57,7 +55,7 @@ public class CamLogic : MonoBehaviour
                     //apply turbo
                     if (bikePhysics.turboBar < bikePhysics.maxTurboBar)
                     {
-                        bikePhysics.turboBar += bikePhysics.turboBoostSpeed * Time.deltaTime;
+                        bikePhysics.turboBar += bikePhysics.turboBoostSpeed;
                     }
                 }
                 Vector3 oldCrowdPos = crowd.transform.position - transform.position;

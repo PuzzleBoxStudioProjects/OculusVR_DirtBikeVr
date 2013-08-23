@@ -6,18 +6,15 @@ public class DrewBikePhysics : MonoBehaviour
     public float speed = 10.0f;
     public float brakeForce = 40.0f;
     public float maxSpeed = 20.0f;
-    public float minSpeed = 10.0f;
     public float steerSpeed = 10.0f;
     public float steerAngle = 30.0f;
     public float deccelSpeed = 3.0f;
     public float flipSpeed = 5.0f;
 
-    public float gravity = 20.0f;
-
     public float flipAngle = 20.0f;
-    public float wheelieAngle = 100.0f;
+    //public float wheelieAngle = 100.0f;
 
-    //[HideInInspector]
+    [HideInInspector]
     public float turboBar = 0.0f;
     public float turboBoostSpeed = 12.0f;
     public float maxTurboBar = 30.0f;
@@ -27,17 +24,14 @@ public class DrewBikePhysics : MonoBehaviour
     public Transform backTire;
 	public Transform frontTire;
     public Transform bikeBody;
-    
-    //[HideInInspector]
+
+    [HideInInspector]
     public bool hasCrashed = false;
 
-    //[HideInInspector]
+    [HideInInspector]
     public float accelFactor = 0.0f;
-    public float curMaxSpeed = 0.0f;
-    private float vertVel = 10.0f;
+    private float curMaxSpeed = 0.0f;
     public float distFromGround = 5.0f;
-
-    private bool hasCollidedBarrier = false;
 
     private Vector3 rotDir;
     private Vector3 moveDir;
@@ -47,8 +41,6 @@ public class DrewBikePhysics : MonoBehaviour
 
     private DrewBackTire drewBackTire;
     private CheckPoints checkPoints;
-
-    private int layerMask = 1 << 8;
 
     void Awake()
     {
@@ -74,7 +66,7 @@ public class DrewBikePhysics : MonoBehaviour
     {
         RaycastHit hitInfo;
 
-        if (!Physics.Raycast(transform.position, Vector3.down, out hitInfo, distFromGround) && !LevelScripts.isGreen)
+        if (!Physics.Raycast(transform.position, Vector3.down, out hitInfo, distFromGround) && LevelScripts.isGreen)
         {
             if (Time.timeScale == 1)
             {
@@ -118,7 +110,7 @@ public class DrewBikePhysics : MonoBehaviour
                 accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
             }
 
-            if (!hasCrashed)
+            if (!hasCrashed && LevelScripts.isGreen)
             {
                 if (gasInput != 0)
                 {
@@ -154,7 +146,7 @@ public class DrewBikePhysics : MonoBehaviour
                 bikeBody.Rotate(Vector3.right * -flipSpeed);
             }
             //make gravity stronger
-            Physics.gravity = new Vector3(0, -18, 0);
+            Physics.gravity = new Vector3(0, -24, 0);
         }
 
         //if crashed stop moving and reset rotation and reposition at the last checkpoint
@@ -189,7 +181,7 @@ public class DrewBikePhysics : MonoBehaviour
 
         //move
         //rigidbody.velocity = transform.TransformDirection(moveDir);
-        if (!LevelScripts.isGreen)
+        if (LevelScripts.isGreen)
         {
             transform.Translate(moveDir * Time.deltaTime);
         }
