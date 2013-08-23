@@ -14,7 +14,6 @@ public class DrewFrontTire : MonoBehaviour
 	void Awake ()
     {
         bikePhysics = bike.GetComponent<DrewBikePhysics>();
-        backTire = backTireTrans.GetComponent<DrewBackTire>();
 	}
 
     void Start()
@@ -24,14 +23,6 @@ public class DrewFrontTire : MonoBehaviour
 
     void Update()
     {
-        CrashGroundCheck();
-    }
-
-    void CrashGroundCheck()
-    {
-        if (Physics.Raycast(transform.position, transform.forward, 1, layerMask) && !backTire.isGrounded)
-        {
-            bikePhysics.hasCrashed = true;
-        }
+        
     }
 }

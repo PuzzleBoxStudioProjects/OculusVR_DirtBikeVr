@@ -61,8 +61,6 @@ public class DrewBikePhysics : MonoBehaviour
         initRot = bikeBody.rotation;
 
         curMaxSpeed = maxSpeed;
-        //TEMPORARY
-        //rotDir.y = 90;
     }
 
 	void Update ()
@@ -76,11 +74,11 @@ public class DrewBikePhysics : MonoBehaviour
     {
         RaycastHit hitInfo;
 
-        if (!Physics.Raycast(transform.position, Vector3.down, out hitInfo, distFromGround)&& LevelScripts.isGreen)
+        if (!Physics.Raycast(transform.position, Vector3.down, out hitInfo, distFromGround) && !LevelScripts.isGreen)
         {
             if (Time.timeScale == 1)
             {
-                Time.timeScale = .65f;
+                Time.timeScale = 0.3f;
             }
         }
         else
@@ -90,6 +88,8 @@ public class DrewBikePhysics : MonoBehaviour
                 Time.timeScale = 1;
             }
         }
+        Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
     }
 
     void Movement()
@@ -147,11 +147,11 @@ public class DrewBikePhysics : MonoBehaviour
             if (!hasCrashed && flipInput > 0)
             {
                 //rotate bike for a flip
-                bikeBody.Rotate(Vector3.left * flipSpeed * flipInput * Time.deltaTime);
+                bikeBody.Rotate(Vector3.right * -flipSpeed);
             }
             if (Input.GetKey(KeyCode.DownArrow) && !hasCrashed)
             {
-                bikeBody.Rotate(Vector3.left * flipSpeed * Time.deltaTime);
+                bikeBody.Rotate(Vector3.right * -flipSpeed);
             }
             //make gravity stronger
             Physics.gravity = new Vector3(0, -18, 0);
@@ -172,7 +172,7 @@ public class DrewBikePhysics : MonoBehaviour
             if ((flipInput == 0 || Input.GetKeyUp(KeyCode.DownArrow)))
             {
                 //reset bike's rotation
-                bikeBody.localRotation = Quaternion.RotateTowards(bikeBody.localRotation, initRot, flipSpeed * Time.deltaTime);
+                bikeBody.localRotation = Quaternion.RotateTowards(bikeBody.localRotation, initRot, flipSpeed);
             }
         }
         //set max and min speeds
@@ -238,11 +238,11 @@ public class DrewBikePhysics : MonoBehaviour
         {
             if (padInput != 0)
             {
-                audio.pitch = padInput * speed * Time.deltaTime;
+                audio.pitch += padInput * 3 * Time.deltaTime;
             }
-            if (keyboardInput != 0)
+            else if (keyboardInput != 0)
             {
-                audio.pitch = keyboardInput * speed * Time.deltaTime;
+                audio.pitch += keyboardInput * 3 * Time.deltaTime;
             }
             if (audio.pitch < 0.5f)
             {

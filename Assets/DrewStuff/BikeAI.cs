@@ -30,8 +30,6 @@ public class BikeAI : MonoBehaviour
     private CheckPoints checkPoints;
     private DrewBackTire backTire;
 
-    //private NavMeshAgent agent;
-
     void Awake()
     {
         backTire = backTireTrans.GetComponent<DrewBackTire>();
@@ -41,16 +39,10 @@ public class BikeAI : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        //agent = GetComponent<NavMeshAgent>();
-
-        //agent.autoBraking = false;
-
         allTargets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Waypoint"));
-        //allTargets.Add(finishTarget);
 
         allTargets.Sort(delegate(GameObject a1, GameObject a2) { return a1.name.CompareTo(a2.name); });
 
-        //agent.destination = allTargets[curTarget].transform.position;
         curSpeed = maxSpeed;
         initRot = bikeBody.rotation;
 	}
@@ -77,7 +69,7 @@ public class BikeAI : MonoBehaviour
             accelFactor = Mathf.MoveTowards(accelFactor, curSpeed, forwardSpeed * Time.deltaTime);
         }
                 
-        if (curTarget < allTargets.Count - 1)
+        if (curTarget <= allTargets.Count - 1)
         {
             Vector3 dir = allTargets[curTarget].transform.position - transform.position;
             float dist = Vector3.Distance(allTargets[curTarget].transform.position, transform.position);
@@ -93,11 +85,10 @@ public class BikeAI : MonoBehaviour
         {
             curTarget = 0;
             //accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
-            //agent.autoBraking = true;
         }
         
         moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
-        if (LevelScripts.isGreen)
+        if (!LevelScripts.isGreen)
         {
             transform.Translate(moveDir * Time.deltaTime);
         }

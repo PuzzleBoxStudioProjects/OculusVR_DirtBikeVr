@@ -12,9 +12,14 @@ public class CrashDummy : MonoBehaviour
         bikePhysics = bike.GetComponent<DrewBikePhysics>();
     }
 
-    void OnTriggerEnter(Collider col)
+    void Update()
     {
-        if (col.transform.name == "LevelTerrain")
+        CrashGroundCheck();
+    }
+
+    void CrashGroundCheck()
+    {
+        if (Physics.Raycast(transform.position, transform.up, 0.5f))
         {
             bikePhysics.hasCrashed = true;
         }
