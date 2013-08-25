@@ -13,11 +13,12 @@ public class LapCounter : MonoBehaviour
 
     void OnGUI()
     {
+        //display ranks after player has finished the race
         if (isRaceFinished)
         {
             for (int i = 0; i < racers.Count; i++)
             {
-                GUI.Label(new Rect(10, 40 * i, 500, 500), "Racer: " + racers[i].name + " placed " + (i + 1));
+                GUI.Label(new Rect(Screen.width / 2, 30 * i, 500, 500), "Racer: " + racers[i].name + " placed " + (i + 1));
             }
         }
     }

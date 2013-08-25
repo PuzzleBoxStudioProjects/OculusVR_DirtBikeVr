@@ -15,6 +15,7 @@ public class BikeAI : MonoBehaviour
     public Transform backTireTrans;
     public Transform bikeBody;
     public Transform lapController;
+    public Transform bike;
 
     public bool hasCrashed = false;
 
@@ -35,7 +36,7 @@ public class BikeAI : MonoBehaviour
     void Awake()
     {
         backTire = backTireTrans.GetComponent<DrewBackTire>();
-        checkPoints = GetComponent<CheckPoints>();
+        checkPoints = bike.GetComponent<CheckPoints>();
         lapCounter = lapController.GetComponent<LapCounter>();
     }
 
@@ -70,7 +71,7 @@ public class BikeAI : MonoBehaviour
                 Invoke("Respawn", 0);
             }
         }
-        else if (!LevelScripts.isGreen)
+        else if (LevelScripts.isGreen)
         {
             //accelerate
             accelFactor = Mathf.MoveTowards(accelFactor, curSpeed, forwardSpeed * Time.deltaTime);
@@ -90,13 +91,16 @@ public class BikeAI : MonoBehaviour
         }
         else
         {
-            if (curLap >= LapCounter.lapCount)
-            {
-                //slow to a stop
-                accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
-            }
-            //loop back to first waypoint
-            curTarget = 0;
+            //if (curLap >= LapCounter.lapCount)
+            //{
+            //    //slow to a stop
+            //    accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
+            //}
+            //else
+            //{
+                //loop back to first waypoint
+                curTarget = 0;
+            //}
         }
         
         moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);

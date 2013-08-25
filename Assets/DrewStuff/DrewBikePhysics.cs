@@ -113,7 +113,7 @@ public class DrewBikePhysics : MonoBehaviour
                 accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
             }
 
-            if (!hasCrashed && !LevelScripts.isGreen)
+            if (!hasCrashed && LevelScripts.isGreen)
             {
                 //turn the bike
                 rotDir.y += steer * steerSpeed * Time.deltaTime;
@@ -261,7 +261,7 @@ public class DrewBikePhysics : MonoBehaviour
 
     void OnTriggerExit(Collider col)
     {
-        if (col.name == "finish line")
+        if (col.tag == "Checkpoint" && checkPoints.curCheckpointPos == checkPoints.allCheckpoints.Count - 1)
         {
             //count for next lap
             curLap++;
