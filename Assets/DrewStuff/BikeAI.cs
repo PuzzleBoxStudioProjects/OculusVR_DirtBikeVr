@@ -22,7 +22,7 @@ public class BikeAI : MonoBehaviour
     public float accelFactor = 0.0f;
     private float curSpeed = 0.0f;
 
-    public int curLap = 1;
+    public int curLap = 0;
 
     private Quaternion initRot;
 
@@ -128,7 +128,7 @@ public class BikeAI : MonoBehaviour
             //count next lap
             curLap++;
             //record rank position
-            if (curLap >= LapCounter.lapCount)
+            if (curLap == LapCounter.lapCount)
             {
                 lapCounter.RecordRank(transform.gameObject);
             }

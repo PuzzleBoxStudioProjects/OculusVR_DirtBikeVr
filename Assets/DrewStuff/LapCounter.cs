@@ -4,7 +4,7 @@ using System.Linq;
 
 public class LapCounter : MonoBehaviour
 {
-    public static int lapCount = 2;
+    public static int lapCount = 5;
     public static bool isRaceFinished = false;
 
     public List<GameObject> racers;

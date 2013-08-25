@@ -21,7 +21,7 @@ public class DrewBikePhysics : MonoBehaviour
     public float turboSpeed = 40.0f;
     public float turboDepletionSpeed = 5.0f;
 
-    public int curLap = 1;
+    public int curLap = 0;
 
     public Transform backTire;
 	public Transform frontTire;
@@ -266,11 +266,19 @@ public class DrewBikePhysics : MonoBehaviour
             //count for next lap
             curLap++;
             //record ranking position
-            if (curLap >= LapCounter.lapCount)
+            if (curLap == LapCounter.lapCount)
             {
                 lapCounter.RecordRank(transform.gameObject);
                 LapCounter.isRaceFinished = true;
             }
+        }
+    }
+
+    void OnGUI()
+    {
+        if (!LapCounter.isRaceFinished)
+        {
+            GUI.Label(new Rect(10, 30, 100, 100), "Lap " + (curLap + 1));
         }
     }
 
