@@ -21,9 +21,12 @@ public class DrewBikePhysics : MonoBehaviour
     public float turboSpeed = 40.0f;
     public float turboDepletionSpeed = 5.0f;
 
+    public int curLap = 1;
+
     public Transform backTire;
 	public Transform frontTire;
     public Transform bikeBody;
+    public Transform lapController;
 
     [HideInInspector]
     public bool hasCrashed = false;
@@ -41,11 +44,13 @@ public class DrewBikePhysics : MonoBehaviour
 
     private DrewBackTire drewBackTire;
     private CheckPoints checkPoints;
+    private LapCounter lapCounter;
 
     void Awake()
     {
         drewBackTire = backTire.GetComponent<DrewBackTire>();
         checkPoints = GetComponent<CheckPoints>();
+        lapCounter = lapController.GetComponent<LapCounter>();
     }
 
     void Start()
@@ -66,6 +71,7 @@ public class DrewBikePhysics : MonoBehaviour
     {
         RaycastHit hitInfo;
 
+        //apply slow mo
         if (!Physics.Raycast(transform.position, Vector3.down, out hitInfo, distFromGround) && LevelScripts.isGreen)
         {
             if (Time.timeScale == 1)
@@ -73,6 +79,7 @@ public class DrewBikePhysics : MonoBehaviour
                 Time.timeScale = 0.3f;
             }
         }
+            //reset to normal speed
         else
         {
             if (Time.timeScale != 1)
@@ -97,10 +104,6 @@ public class DrewBikePhysics : MonoBehaviour
 
         if (drewBackTire.isGrounded)
         {
-            //turn the bike
-            rotDir.y += steer * steerSpeed * Time.deltaTime;
-            //do a wheelie
-            //bikeBody.localRotation = Quaternion.RotateTowards(bikeBody.localRotation, Quaternion.Euler(wheelieAngle, 0, 0), flipSpeed * Time.deltaTime);
             //reset gravity
             Physics.gravity = new Vector3(0, -9.81f, 0);
 
@@ -110,8 +113,11 @@ public class DrewBikePhysics : MonoBehaviour
                 accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
             }
 
-            if (!hasCrashed && LevelScripts.isGreen)
+            if (!hasCrashed && !LevelScripts.isGreen)
             {
+                //turn the bike
+                rotDir.y += steer * steerSpeed * Time.deltaTime;
+
                 if (gasInput != 0)
                 {
                     //accelerate
@@ -180,19 +186,9 @@ public class DrewBikePhysics : MonoBehaviour
         transform.eulerAngles = rotDir;
 
         //move
-        //rigidbody.velocity = transform.TransformDirection(moveDir);
-        if (LevelScripts.isGreen)
-        {
-            transform.Translate(moveDir * Time.deltaTime);
-        }
-        //RaycastHit hitInfo;
-
-        //if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, 2))
+        //if (!LevelScripts.isGreen)
         //{
-        //    Vector3 surfaceNormal = hitInfo.normal;
-        //    surfaceNormal.Normalize();
-
-        //    transform.rotation = Quaternion.FromToRotation(transform.up, surfaceNormal) * transform.rotation;
+            transform.Translate(moveDir * Time.deltaTime);
         //}
     }
 
@@ -228,6 +224,7 @@ public class DrewBikePhysics : MonoBehaviour
     {
         if (!Input.GetButton("Boost") || !Input.GetButton("Jump"))
         {
+            //rev engine sound
             if (padInput != 0)
             {
                 audio.pitch += padInput * 3 * Time.deltaTime;
@@ -236,6 +233,7 @@ public class DrewBikePhysics : MonoBehaviour
             {
                 audio.pitch += keyboardInput * 3 * Time.deltaTime;
             }
+            //cap off the pitch
             if (audio.pitch < 0.5f)
             {
                 audio.pitch = 0.5f;
@@ -245,6 +243,7 @@ public class DrewBikePhysics : MonoBehaviour
                 audio.pitch = 1.5f;
             }
         }
+        //reset the pitch
         if (padInput == 0 && keyboardInput == 0)
         {
             audio.pitch = 0.5f;
@@ -257,6 +256,21 @@ public class DrewBikePhysics : MonoBehaviour
         {
             accelFactor = 0;
             Respawn();
+        }
+    }
+
+    void OnTriggerExit(Collider col)
+    {
+        if (col.name == "finish line")
+        {
+            //count for next lap
+            curLap++;
+            //record ranking position
+            if (curLap >= LapCounter.lapCount)
+            {
+                lapCounter.RecordRank(transform.gameObject);
+                LapCounter.isRaceFinished = true;
+            }
         }
     }
 

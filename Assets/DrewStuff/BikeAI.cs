@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class BikeAI : MonoBehaviour
 {
-    public List<GameObject> allTargets;
+    private List<GameObject> allTargets;
     private int curTarget;
 
     public float rotSpeed = 20.0f;
@@ -14,13 +14,14 @@ public class BikeAI : MonoBehaviour
 
     public Transform backTireTrans;
     public Transform bikeBody;
+    public Transform lapController;
 
     public bool hasCrashed = false;
 
     public float accelFactor = 0.0f;
     private float curSpeed = 0.0f;
 
-    public int steerDir = 1;
+    public int curLap = 1;
 
     private Quaternion initRot;
 
@@ -29,18 +30,22 @@ public class BikeAI : MonoBehaviour
 
     private CheckPoints checkPoints;
     private DrewBackTire backTire;
+    private LapCounter lapCounter;
 
     void Awake()
     {
         backTire = backTireTrans.GetComponent<DrewBackTire>();
         checkPoints = GetComponent<CheckPoints>();
+        lapCounter = lapController.GetComponent<LapCounter>();
     }
 
 	// Use this for initialization
 	void Start ()
     {
+        //add all waypoints
         allTargets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Waypoint"));
 
+        //put all the waypoints in order by name
         allTargets.Sort(delegate(GameObject a1, GameObject a2) { return a1.name.CompareTo(a2.name); });
 
         curSpeed = maxSpeed;
@@ -59,16 +64,19 @@ public class BikeAI : MonoBehaviour
         {
             accelFactor = 0;
 
+            //we crashed so respawn
             if (!IsInvoking("Respawn"))
             {
                 Invoke("Respawn", 0);
             }
         }
-        else if (LevelScripts.isGreen)
+        else if (!LevelScripts.isGreen)
         {
+            //accelerate
             accelFactor = Mathf.MoveTowards(accelFactor, curSpeed, forwardSpeed * Time.deltaTime);
         }
-                
+        
+        //go through the waypoints
         if (curTarget <= allTargets.Count - 1)
         {
             Vector3 dir = allTargets[curTarget].transform.position - transform.position;
@@ -80,19 +88,24 @@ public class BikeAI : MonoBehaviour
             }
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), rotSpeed * Time.deltaTime);
         }
-
         else
         {
+            if (curLap >= LapCounter.lapCount)
+            {
+                //slow to a stop
+                accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
+            }
+            //loop back to first waypoint
             curTarget = 0;
-            //accelFactor = Mathf.MoveTowards(accelFactor, 0, deccelSpeed * Time.deltaTime);
         }
         
         moveDir = new Vector3(0, rigidbody.velocity.y, accelFactor);
 
-        if (LevelScripts.isGreen)
-        {
+        //move
+        //if (LevelScripts.isGreen)
+        //{
             transform.Translate(moveDir * Time.deltaTime);
-        }
+        //}
     }
 
     void Respawn()
@@ -102,6 +115,20 @@ public class BikeAI : MonoBehaviour
         transform.position = checkPoints.currentCheckpoint.position;
 
         hasCrashed = false;
+    }
+
+    void OnTriggerExit(Collider col)
+    {
+        if (col.name == "finish line")
+        {
+            //count next lap
+            curLap++;
+            //record rank position
+            if (curLap >= LapCounter.lapCount)
+            {
+                lapCounter.RecordRank(transform.gameObject);
+            }
+        }
     }
 
     //limit the angle

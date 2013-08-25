@@ -20,9 +20,4 @@ public class DrewFrontTire : MonoBehaviour
     {
         layerMask = ~layerMask;
     }
-
-    void Update()
-    {
-        
-    }
 }
