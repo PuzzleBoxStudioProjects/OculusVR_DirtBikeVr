@@ -290,8 +290,8 @@ public class DrewBikePhysics : MonoBehaviour
 
         if (!LapController.isRaceFinished)
         {
-            GUI.Label(new Rect(10, 40, 500, 100), "Lap " + (curLap + 1) + "/" + LapController.lapCount);
-            GUI.Label(new Rect(10, 10, 500, 100), "Turbo: " + turboBar.ToString("f0") + "/" + maxTurboBar);
+            GUI.Label(new Rect(120, 100, 500, 100), "Lap " + (curLap + 1) + "/" + LapController.lapCount);
+            GUI.Label(new Rect(250, 100, 500, 100), "Turbo: " + turboBar.ToString("f0") + "/" + maxTurboBar);
         }
     }
 

@@ -44,7 +44,7 @@ public class LapController : MonoBehaviour
                         playedOnce = false;
                     }
                 }
-                GUI.Label(new Rect(Screen.width / 2, 30 * i, 500, 500), "Racer: " + racers[i].name + " placed " + (i + 1));
+                GUI.Label(new Rect(250, 100 * i, 500, 500), "Racer: " + racers[i].name + " placed " + (i + 1));
             }
             if (!IsInvoking("EndRace"))
             {
