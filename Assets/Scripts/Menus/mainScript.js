@@ -7,8 +7,8 @@
 var yourCursor : Texture2D;  // Your cursor texture
 var cursorSizeX : int = 16;  // Your cursor size x
 var cursorSizeY : int = 16;  // Your cursor size y
-var mouseX:float = 1024.0f/2.0f;
-var mouseY:float = 768.0f/2.0f; 
+var mouseX:float = 864.0f;
+var mouseY:float = 256.0f; 
 var iconSpeed:float = 3.0f;
 function Awake()
 {
@@ -34,7 +34,10 @@ function Update()
 		 	 mouseY += Input.GetAxis("Vertical")*iconSpeed;
     }
     
-
+    if (mouseX < 600)
+    {
+        mouseX = 600;
+    }
     //check if the left mouse has been pressed down this frame
     if (Input.GetButtonDown("Trick2"))
     {
@@ -50,7 +53,6 @@ function Update()
         // starts game.
         if ( hit.collider.name == "startCube")
          {
-         	print("hit startcube");
          	Application.LoadLevel(2);
          }
          // loads controller guide
@@ -61,8 +63,7 @@ function Update()
          // loads how to pla
          if (hit.collider.name == "exitCube")
          {
-         	print("Just Quit");
-         	// Application.Quit();
+         	 Application.Quit();
          } 
        
         }

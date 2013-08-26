@@ -63,7 +63,7 @@ public class LevelScripts : MonoBehaviour
 			else
 			{
 				StartTimer();
-				print (showTimer);
+                //print (showTimer);
 			//	StartLapCounter();
 			}
 		}

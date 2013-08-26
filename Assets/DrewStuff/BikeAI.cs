@@ -31,13 +31,13 @@ public class BikeAI : MonoBehaviour
 
     private CheckPoints checkPoints;
     private DrewBackTire backTire;
-    private LapCounter lapCounter;
+    private LapController lapCounter;
 
     void Awake()
     {
         backTire = backTireTrans.GetComponent<DrewBackTire>();
         checkPoints = bike.GetComponent<CheckPoints>();
-        lapCounter = lapController.GetComponent<LapCounter>();
+        lapCounter = lapController.GetComponent<LapController>();
     }
 
 	// Use this for initialization
@@ -128,7 +128,7 @@ public class BikeAI : MonoBehaviour
             //count next lap
             curLap++;
             //record rank position
-            if (curLap == LapCounter.lapCount)
+            if (curLap == LapController.lapCount)
             {
                 lapCounter.RecordRank(transform.gameObject);
             }

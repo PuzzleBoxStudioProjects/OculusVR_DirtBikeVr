@@ -3,6 +3,8 @@ using System.Collections;
 
 public class DrewBikePhysics : MonoBehaviour
 {
+    public GUISkin mySkin;
+
     public float speed = 10.0f;
     public float brakeForce = 40.0f;
     public float maxSpeed = 20.0f;
@@ -14,7 +16,7 @@ public class DrewBikePhysics : MonoBehaviour
     public float flipAngle = 20.0f;
     //public float wheelieAngle = 100.0f;
 
-    [HideInInspector]
+    //[HideInInspector]
     public float turboBar = 0.0f;
     public float turboBoostSpeed = 12.0f;
     public float maxTurboBar = 30.0f;
@@ -44,13 +46,13 @@ public class DrewBikePhysics : MonoBehaviour
 
     private DrewBackTire drewBackTire;
     private CheckPoints checkPoints;
-    private LapCounter lapCounter;
+    private LapController lapCounter;
 
     void Awake()
     {
         drewBackTire = backTire.GetComponent<DrewBackTire>();
         checkPoints = GetComponent<CheckPoints>();
-        lapCounter = lapController.GetComponent<LapCounter>();
+        lapCounter = lapController.GetComponent<LapController>();
     }
 
     void Start()
@@ -218,6 +220,14 @@ public class DrewBikePhysics : MonoBehaviour
             //reset speed
             curMaxSpeed = maxSpeed;
         }
+        if (turboBar < 0)
+        {
+            turboBar = 0;
+        }
+        if (turboBar > maxTurboBar)
+        {
+            turboBar = maxTurboBar;
+        }
     }
 
     void GearShifts(float padInput, float keyboardInput)
@@ -266,19 +276,22 @@ public class DrewBikePhysics : MonoBehaviour
             //count for next lap
             curLap++;
             //record ranking position
-            if (curLap == LapCounter.lapCount)
+            if (curLap == LapController.lapCount)
             {
                 lapCounter.RecordRank(transform.gameObject);
-                LapCounter.isRaceFinished = true;
+                LapController.isRaceFinished = true;
             }
         }
     }
 
     void OnGUI()
     {
-        if (!LapCounter.isRaceFinished)
+        GUI.skin = mySkin;
+
+        if (!LapController.isRaceFinished)
         {
-            GUI.Label(new Rect(10, 30, 100, 100), "Lap " + (curLap + 1));
+            GUI.Label(new Rect(10, 40, 500, 100), "Lap " + (curLap + 1) + "/" + LapController.lapCount);
+            GUI.Label(new Rect(10, 10, 500, 100), "Turbo: " + turboBar.ToString("f0") + "/" + maxTurboBar);
         }
     }
 

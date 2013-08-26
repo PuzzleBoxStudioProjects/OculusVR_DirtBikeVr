@@ -12,6 +12,8 @@ var mouseY:float = 768.0f/2.0f;
 var iconSpeed:float = 3.0f;
 function Awake()
 {
+mouseX = 864.0f;
+    mouseY = 256.0f;
     Screen.showCursor = false;
 }
  
@@ -34,6 +36,10 @@ function Update()
 		 	 mouseY += Input.GetAxis("Vertical")*iconSpeed;
     }
     
+    if (mouseX < 600)
+    {
+        mouseX = 600;
+    }
 
     //check if the left mouse has been pressed down this frame
     if (Input.GetButtonDown("Trick2"))
